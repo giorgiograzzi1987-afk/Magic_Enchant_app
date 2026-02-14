@@ -361,6 +361,10 @@ input[type="text"] {
   white-space: pre-wrap;
 }
 
+.modal-body.hidden {
+  display: none;
+}
+
 .modal-close {
   position: absolute;
   top: 10px;

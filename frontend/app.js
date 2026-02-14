@@ -214,10 +214,16 @@ function renderKnown() {
 }
 
 function openSpellModal(spell) {
-  modalTitle.textContent = spell.name;
-  modalMeta.textContent = `${spellLevelLabel(spell.level)} · ${spell.school || ""}`;
-  modalDescription.textContent = spell.description || "";
-  modalHigher.textContent = spell.higher_level ? `Ai livelli superiori: ${spell.higher_level}` : "";
+  modalTitle.textContent = spell.name || "Incantesimo";
+  modalMeta.textContent = `${spellLevelLabel(spell.level || 0)} · ${spell.school || ""}`;
+  modalDescription.textContent = spell.description || "Descrizione non disponibile.";
+  if (spell.higher_level) {
+    modalHigher.textContent = `Ai livelli superiori: ${spell.higher_level}`;
+    modalHigher.classList.remove("hidden");
+  } else {
+    modalHigher.textContent = "";
+    modalHigher.classList.add("hidden");
+  }
   spellModal.classList.remove("hidden");
   spellModal.setAttribute("aria-hidden", "false");
 }
@@ -229,6 +235,12 @@ function closeSpellModal() {
 
 spellModal.addEventListener("click", (e) => {
   if (e.target && e.target.dataset && e.target.dataset.close) {
+    closeSpellModal();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !spellModal.classList.contains("hidden")) {
     closeSpellModal();
   }
 });
@@ -419,7 +431,15 @@ function bindFilters() {
     const spell = state.spells.find((item) => item.id === spellId);
     if (spell) {
       openSpellModal(spell);
+      return;
     }
+    fetch(`/api/spells/${spellId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          openSpellModal(data);
+        }
+      });
   });
 }
 
