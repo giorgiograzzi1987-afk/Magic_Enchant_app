@@ -209,5 +209,48 @@ def spells() -> Any:
     return jsonify(results)
 
 
+@app.route("/api/spells/<int:spell_id>")
+def spell_detail(spell_id: int) -> Any:
+    conn = get_db()
+    row = conn.execute(
+        """
+        SELECT spells.*, 
+               COALESCE(spell_status.known, 0) AS known,
+               COALESCE(spell_status.prepared, 0) AS prepared,
+               COALESCE(spell_status.favorite, 0) AS favorite
+        FROM spells
+        LEFT JOIN spell_status ON spell_status.spell_id = spells.id
+        WHERE spells.id = ?
+        """,
+        (spell_id,),
+    ).fetchone()
+
+    if not row:
+        return jsonify({"error": "not_found"}), 404
+
+    return jsonify(
+        {
+            "id": row["id"],
+            "name": row["name"],
+            "level": row["level"],
+            "school": row["school"],
+            "ritual": bool(row["ritual"]),
+            "concentration": bool(row["concentration"]),
+            "casting_time": row["casting_time"],
+            "range": row["range"],
+            "components": row["components"],
+            "material": row["material"],
+            "duration": row["duration"],
+            "classes": row["classes"],
+            "description": row["description"],
+            "higher_level": row["higher_level"],
+            "url": row["url"],
+            "known": bool(row["known"]),
+            "prepared": bool(row["prepared"]),
+            "favorite": bool(row["favorite"]),
+        }
+    )
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5178)
