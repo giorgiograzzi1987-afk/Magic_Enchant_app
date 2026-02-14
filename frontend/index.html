@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Magic Enchant — Incantesimi 5e</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">✨</span>
+        <div>
+          <h1>Magic Enchant</h1>
+          <p>Gestione incantesimi D&amp;D 5e</p>
+        </div>
+      </div>
+      <div class="character">
+        <label>
+          Classe PG
+          <select id="classSelect">
+            <option value="">—</option>
+            <option value="bardo">Bardo</option>
+            <option value="chierico">Chierico</option>
+            <option value="druido">Druido</option>
+            <option value="mago">Mago</option>
+            <option value="paladino">Paladino</option>
+            <option value="ranger">Ranger</option>
+            <option value="stregone">Stregone</option>
+            <option value="warlock">Warlock</option>
+            <option value="artefice">Artefice</option>
+            <option value="altro">Altro</option>
+          </select>
+        </label>
+        <label>
+          Livello
+          <select id="levelSelect"></select>
+        </label>
+      </div>
+    </header>
+
+    <section class="filters">
+      <div class="simple-filters">
+        <input id="searchInput" type="search" placeholder="Cerca incantesimo" />
+        <select id="levelFilter">
+          <option value="">Tutti i livelli</option>
+          <option value="0">Trucchetto</option>
+          <option value="1">1°</option>
+          <option value="2">2°</option>
+          <option value="3">3°</option>
+          <option value="4">4°</option>
+          <option value="5">5°</option>
+          <option value="6">6°</option>
+          <option value="7">7°</option>
+          <option value="8">8°</option>
+          <option value="9">9°</option>
+        </select>
+        <select id="classFilter">
+          <option value="">Tutte le classi</option>
+          <option value="bardo">Bardo</option>
+          <option value="chierico">Chierico</option>
+          <option value="druido">Druido</option>
+          <option value="mago">Mago</option>
+          <option value="paladino">Paladino</option>
+          <option value="ranger">Ranger</option>
+          <option value="stregone">Stregone</option>
+          <option value="warlock">Warlock</option>
+          <option value="artefice">Artefice</option>
+        </select>
+        <button id="toggleAdvanced" class="ghost">Filtri avanzati</button>
+      </div>
+
+      <div id="advancedFilters" class="advanced hidden">
+        <div class="filter-group">
+          <label>Scuola</label>
+          <select id="schoolFilter">
+            <option value="">Tutte</option>
+            <option value="abiurazione">Abiurazione</option>
+            <option value="ammaliamento">Ammaliamento</option>
+            <option value="divinazione">Divinazione</option>
+            <option value="evocazione">Evocazione</option>
+            <option value="illusione">Illusione</option>
+            <option value="invocazione">Invocazione</option>
+            <option value="necromanzia">Necromanzia</option>
+            <option value="trasmutazione">Trasmutazione</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Rituale</label>
+          <select id="ritualFilter">
+            <option value="">Qualsiasi</option>
+            <option value="true">Sì</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Concentrazione</label>
+          <select id="concentrationFilter">
+            <option value="">Qualsiasi</option>
+            <option value="true">Sì</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Componente</label>
+          <select id="componentFilter">
+            <option value="">Qualsiasi</option>
+            <option value="V">V</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <main class="content">
+      <section class="spells">
+        <h2>Compendio</h2>
+        <div id="spellsList" class="cards"></div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="panel">
+          <h3>Slot disponibili</h3>
+          <div id="slotsPanel" class="slots"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Incantesimi conosciuti</h3>
+          <ul id="knownList" class="known-list"></ul>
+        </div>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
