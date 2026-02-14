@@ -23,12 +23,26 @@ def get_db() -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     if initialize:
         init_db(conn)
+    else:
+        ensure_character_columns(conn)
     return conn
+
+
+def ensure_character_columns(conn: sqlite3.Connection) -> None:
+    columns = {
+        row["name"]
+        for row in conn.execute("PRAGMA table_info(character_profile)").fetchall()
+    }
+    if "name" not in columns:
+        conn.execute("ALTER TABLE character_profile ADD COLUMN name TEXT")
+    if "subclass" not in columns:
+        conn.execute("ALTER TABLE character_profile ADD COLUMN subclass TEXT")
 
 
 def init_db(conn: sqlite3.Connection) -> None:
     with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
         conn.executescript(f.read())
+    ensure_character_columns(conn)
     conn.commit()
 
 
@@ -42,7 +56,9 @@ def character() -> Any:
     conn = get_db()
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
+        name = data.get("name")
         class_name = data.get("class_name")
+        subclass = data.get("subclass")
         level = data.get("level")
         try:
             level = int(level)
@@ -51,15 +67,26 @@ def character() -> Any:
         if level is not None and (level < 1 or level > 20):
             return jsonify({"error": "level_out_of_range"}), 400
         conn.execute(
-            "UPDATE character_profile SET class_name = ?, level = ? WHERE id = 1",
-            (class_name, level or 1),
+            """
+            UPDATE character_profile
+            SET name = ?, class_name = ?, subclass = ?, level = ?
+            WHERE id = 1
+            """,
+            (name, class_name, subclass, level or 1),
         )
         conn.commit()
 
     row = conn.execute(
-        "SELECT class_name, level FROM character_profile WHERE id = 1"
+        "SELECT name, class_name, subclass, level FROM character_profile WHERE id = 1"
     ).fetchone()
-    return jsonify({"class_name": row["class_name"], "level": row["level"]})
+    return jsonify(
+        {
+            "name": row["name"],
+            "class_name": row["class_name"],
+            "subclass": row["subclass"],
+            "level": row["level"],
+        }
+    )
 
 
 @app.route("/api/status", methods=["POST"])
