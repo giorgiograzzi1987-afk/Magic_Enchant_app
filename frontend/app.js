@@ -25,10 +25,21 @@ const savePgButton = document.getElementById("savePg");
 const spellsList = document.getElementById("spellsList");
 const knownList = document.getElementById("knownList");
 const slotsPanel = document.getElementById("slotsPanel");
+const createPgSection = document.getElementById("createPgSection");
 const pgSection = document.getElementById("pgSection");
 const spellsSection = document.getElementById("spellsSection");
+const showCreatePgButton = document.getElementById("showCreatePg");
 const showPgButton = document.getElementById("showPg");
 const showSpellsButton = document.getElementById("showSpells");
+const pgSummaryName = document.getElementById("pgSummaryName");
+const pgSummaryClass = document.getElementById("pgSummaryClass");
+const pgSummarySubclass = document.getElementById("pgSummarySubclass");
+const pgSummaryLevel = document.getElementById("pgSummaryLevel");
+const spellModal = document.getElementById("spellModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalMeta = document.getElementById("modalMeta");
+const modalDescription = document.getElementById("modalDescription");
+const modalHigher = document.getElementById("modalHigher");
 
 const filterInputs = {
   searchInput: document.getElementById("searchInput"),
@@ -48,13 +59,17 @@ toggleAdvanced.addEventListener("click", () => {
 });
 
 function setActivePage(page) {
+  const isCreate = page === "create";
   const isPg = page === "pg";
+  createPgSection.classList.toggle("hidden", !isCreate);
   pgSection.classList.toggle("hidden", !isPg);
-  spellsSection.classList.toggle("hidden", isPg);
+  spellsSection.classList.toggle("hidden", page !== "spells");
+  showCreatePgButton.classList.toggle("active", isCreate);
   showPgButton.classList.toggle("active", isPg);
-  showSpellsButton.classList.toggle("active", !isPg);
+  showSpellsButton.classList.toggle("active", page === "spells");
 }
 
+showCreatePgButton.addEventListener("click", () => setActivePage("create"));
 showPgButton.addEventListener("click", () => setActivePage("pg"));
 showSpellsButton.addEventListener("click", () => setActivePage("spells"));
 
@@ -92,6 +107,10 @@ async function fetchCharacter() {
   pgSubclassInput.value = state.character.subclass || "";
   pgClassSelect.value = state.character.class_name || "";
   pgLevelSelect.value = state.character.level || 1;
+  pgSummaryName.textContent = state.character.name || "—";
+  pgSummaryClass.textContent = state.character.class_name || "—";
+  pgSummarySubclass.textContent = state.character.subclass || "—";
+  pgSummaryLevel.textContent = state.character.level || "—";
   renderSlots();
 }
 
@@ -105,6 +124,10 @@ async function updateCharacter() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(state.character),
   });
+  pgSummaryName.textContent = state.character.name || "—";
+  pgSummaryClass.textContent = state.character.class_name || "—";
+  pgSummarySubclass.textContent = state.character.subclass || "—";
+  pgSummaryLevel.textContent = state.character.level || "—";
   renderSlots();
 }
 
@@ -181,7 +204,7 @@ function renderKnown() {
     .filter((spell) => spell.known)
     .forEach((spell) => {
       const li = document.createElement("li");
-      li.innerHTML = `<span>${spell.name}</span>`;
+      li.innerHTML = `<button class="known-link" data-spell-id="${spell.id}">${spell.name}</button>`;
       const tags = document.createElement("span");
       tags.className = "tags";
       tags.textContent = `${spellLevelLabel(spell.level)} · ${spell.school || ""}`;
@@ -189,6 +212,26 @@ function renderKnown() {
       knownList.appendChild(li);
     });
 }
+
+function openSpellModal(spell) {
+  modalTitle.textContent = spell.name;
+  modalMeta.textContent = `${spellLevelLabel(spell.level)} · ${spell.school || ""}`;
+  modalDescription.textContent = spell.description || "";
+  modalHigher.textContent = spell.higher_level ? `Ai livelli superiori: ${spell.higher_level}` : "";
+  spellModal.classList.remove("hidden");
+  spellModal.setAttribute("aria-hidden", "false");
+}
+
+function closeSpellModal() {
+  spellModal.classList.add("hidden");
+  spellModal.setAttribute("aria-hidden", "true");
+}
+
+spellModal.addEventListener("click", (e) => {
+  if (e.target && e.target.dataset && e.target.dataset.close) {
+    closeSpellModal();
+  }
+});
 
 async function updateStatus(spell) {
   await fetch("/api/status", {
@@ -369,6 +412,15 @@ function bindFilters() {
   pgNameInput.addEventListener("input", debounceSaveCharacter);
   pgSubclassInput.addEventListener("input", debounceSaveCharacter);
   savePgButton.addEventListener("click", updateCharacter);
+  knownList.addEventListener("click", (e) => {
+    const button = e.target.closest(".known-link");
+    if (!button) return;
+    const spellId = Number(button.dataset.spellId);
+    const spell = state.spells.find((item) => item.id === spellId);
+    if (spell) {
+      openSpellModal(spell);
+    }
+  });
 }
 
 let debounceId = null;
@@ -387,3 +439,4 @@ buildLevelOptions();
 bindFilters();
 fetchCharacter();
 fetchSpells();
+setActivePage("create");

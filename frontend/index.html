@@ -16,51 +16,80 @@
         </div>
       </div>
       <div class="nav">
-        <button id="showPg" class="tab active">PG</button>
+        <button id="showCreatePg" class="tab active">Crea PG</button>
+        <button id="showPg" class="tab">PG</button>
         <button id="showSpells" class="tab">Incantesimi</button>
       </div>
     </header>
 
     <main>
-      <section id="pgSection" class="page">
+      <section id="createPgSection" class="page">
         <div class="page-header">
-          <h2>Il tuo PG</h2>
-          <p>Crea il personaggio con nome e sottoclasse.</p>
+          <h2>Crea il tuo PG</h2>
+          <p>Imposta nome, classe, sottoclasse e livello.</p>
+        </div>
+        <div class="panel">
+          <h3>Profilo PG</h3>
+          <div class="pg-form">
+            <label>
+              Nome
+              <input id="pgName" type="text" placeholder="Es. Elowen" />
+            </label>
+            <label>
+              Classe
+              <select id="pgClass">
+                <option value="">—</option>
+                <option value="bardo">Bardo</option>
+                <option value="chierico">Chierico</option>
+                <option value="druido">Druido</option>
+                <option value="mago">Mago</option>
+                <option value="paladino">Paladino</option>
+                <option value="ranger">Ranger</option>
+                <option value="stregone">Stregone</option>
+                <option value="warlock">Warlock</option>
+                <option value="artefice">Artefice</option>
+                <option value="altro">Altro</option>
+              </select>
+            </label>
+            <label>
+              Sottoclasse
+              <input id="pgSubclass" type="text" placeholder="Es. Evocazione" />
+            </label>
+            <label>
+              Livello
+              <select id="pgLevel"></select>
+            </label>
+            <button id="savePg" class="primary">Salva PG</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="pgSection" class="page hidden">
+        <div class="page-header">
+          <h2>Pagina del PG</h2>
+          <p>Controlla il profilo e gli incantesimi conosciuti.</p>
         </div>
 
         <div class="pg-grid">
           <div class="panel">
-            <h3>Profilo PG</h3>
-            <div class="pg-form">
-              <label>
-                Nome
-                <input id="pgName" type="text" placeholder="Es. Elowen" />
-              </label>
-              <label>
-                Classe
-                <select id="pgClass">
-                  <option value="">—</option>
-                  <option value="bardo">Bardo</option>
-                  <option value="chierico">Chierico</option>
-                  <option value="druido">Druido</option>
-                  <option value="mago">Mago</option>
-                  <option value="paladino">Paladino</option>
-                  <option value="ranger">Ranger</option>
-                  <option value="stregone">Stregone</option>
-                  <option value="warlock">Warlock</option>
-                  <option value="artefice">Artefice</option>
-                  <option value="altro">Altro</option>
-                </select>
-              </label>
-              <label>
-                Sottoclasse
-                <input id="pgSubclass" type="text" placeholder="Es. Evocazione" />
-              </label>
-              <label>
-                Livello
-                <select id="pgLevel"></select>
-              </label>
-              <button id="savePg" class="primary">Salva PG</button>
+            <h3>Profilo</h3>
+            <div class="pg-summary">
+              <div>
+                <span class="label">Nome</span>
+                <strong id="pgSummaryName">—</strong>
+              </div>
+              <div>
+                <span class="label">Classe</span>
+                <strong id="pgSummaryClass">—</strong>
+              </div>
+              <div>
+                <span class="label">Sottoclasse</span>
+                <strong id="pgSummarySubclass">—</strong>
+              </div>
+              <div>
+                <span class="label">Livello</span>
+                <strong id="pgSummaryLevel">—</strong>
+              </div>
             </div>
           </div>
 
@@ -157,6 +186,17 @@
         </section>
       </section>
     </main>
+
+    <div id="spellModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <button class="modal-close" data-close="true">×</button>
+        <h3 id="modalTitle">Incantesimo</h3>
+        <p id="modalMeta" class="meta"></p>
+        <p id="modalDescription" class="modal-body"></p>
+        <p id="modalHigher" class="modal-body"></p>
+      </div>
+    </div>
 
     <script src="app.js"></script>
   </body>
