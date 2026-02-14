@@ -32,9 +32,11 @@ CREATE TABLE IF NOT EXISTS spell_status (
 
 CREATE TABLE IF NOT EXISTS character_profile (
     id INTEGER PRIMARY KEY CHECK (id = 1),
+    name TEXT,
     class_name TEXT,
+    subclass TEXT,
     level INTEGER DEFAULT 1
 );
 
-INSERT OR IGNORE INTO character_profile (id, class_name, level)
-VALUES (1, NULL, 1);
+INSERT OR IGNORE INTO character_profile (id, name, class_name, subclass, level)
+VALUES (1, NULL, NULL, NULL, 1);
