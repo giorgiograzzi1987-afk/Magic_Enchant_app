@@ -10,16 +10,25 @@ const state = {
     component: "",
   },
   character: {
+    name: "",
     class_name: "",
+    subclass: "",
     level: 1,
   },
 };
 
-const levelSelect = document.getElementById("levelSelect");
-const classSelect = document.getElementById("classSelect");
+const pgNameInput = document.getElementById("pgName");
+const pgSubclassInput = document.getElementById("pgSubclass");
+const pgLevelSelect = document.getElementById("pgLevel");
+const pgClassSelect = document.getElementById("pgClass");
+const savePgButton = document.getElementById("savePg");
 const spellsList = document.getElementById("spellsList");
 const knownList = document.getElementById("knownList");
 const slotsPanel = document.getElementById("slotsPanel");
+const pgSection = document.getElementById("pgSection");
+const spellsSection = document.getElementById("spellsSection");
+const showPgButton = document.getElementById("showPg");
+const showSpellsButton = document.getElementById("showSpells");
 
 const filterInputs = {
   searchInput: document.getElementById("searchInput"),
@@ -38,12 +47,23 @@ toggleAdvanced.addEventListener("click", () => {
   advancedPanel.classList.toggle("hidden");
 });
 
+function setActivePage(page) {
+  const isPg = page === "pg";
+  pgSection.classList.toggle("hidden", !isPg);
+  spellsSection.classList.toggle("hidden", isPg);
+  showPgButton.classList.toggle("active", isPg);
+  showSpellsButton.classList.toggle("active", !isPg);
+}
+
+showPgButton.addEventListener("click", () => setActivePage("pg"));
+showSpellsButton.addEventListener("click", () => setActivePage("spells"));
+
 function buildLevelOptions() {
   for (let i = 1; i <= 20; i += 1) {
     const opt = document.createElement("option");
     opt.value = i;
     opt.textContent = `${i}`;
-    levelSelect.appendChild(opt);
+    pgLevelSelect.appendChild(opt);
   }
 }
 
@@ -68,14 +88,18 @@ async function fetchSpells() {
 async function fetchCharacter() {
   const res = await fetch("/api/character");
   state.character = await res.json();
-  classSelect.value = state.character.class_name || "";
-  levelSelect.value = state.character.level || 1;
+  pgNameInput.value = state.character.name || "";
+  pgSubclassInput.value = state.character.subclass || "";
+  pgClassSelect.value = state.character.class_name || "";
+  pgLevelSelect.value = state.character.level || 1;
   renderSlots();
 }
 
 async function updateCharacter() {
-  state.character.class_name = classSelect.value || "";
-  state.character.level = Number(levelSelect.value || 1);
+  state.character.name = pgNameInput.value.trim();
+  state.character.subclass = pgSubclassInput.value.trim();
+  state.character.class_name = pgClassSelect.value || "";
+  state.character.level = Number(pgLevelSelect.value || 1);
   await fetch("/api/character", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -340,14 +364,23 @@ function bindFilters() {
     fetchSpells();
   });
 
-  classSelect.addEventListener("change", updateCharacter);
-  levelSelect.addEventListener("change", updateCharacter);
+  pgClassSelect.addEventListener("change", updateCharacter);
+  pgLevelSelect.addEventListener("change", updateCharacter);
+  pgNameInput.addEventListener("input", debounceSaveCharacter);
+  pgSubclassInput.addEventListener("input", debounceSaveCharacter);
+  savePgButton.addEventListener("click", updateCharacter);
 }
 
 let debounceId = null;
 function debounceFetch() {
   clearTimeout(debounceId);
   debounceId = setTimeout(fetchSpells, 300);
+}
+
+let debounceCharacterId = null;
+function debounceSaveCharacter() {
+  clearTimeout(debounceCharacterId);
+  debounceCharacterId = setTimeout(updateCharacter, 400);
 }
 
 buildLevelOptions();
